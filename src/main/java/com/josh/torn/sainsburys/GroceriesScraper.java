@@ -40,7 +40,7 @@ public class GroceriesScraper {
             Document productPage;
             productPage = Jsoup.connect(product.select("a").attr("abs:href")).get();
 
-            int kcalPer100g = 0;
+            String kcalPer100g = scrapeKcalPer100g(productPage);
 
             String description = scrapeDescription(productPage);
 
@@ -51,6 +51,8 @@ public class GroceriesScraper {
             System.out.println(items[index].getTitle());
 
             System.out.println("£" + items[index].getUnitPrice());
+
+            System.out.println(items[index].getKcalPer100g());
 
             System.out.println(items[index].getDescription());
 
@@ -64,11 +66,13 @@ public class GroceriesScraper {
 
     }
 
+
     // scrapes the title of a product from the groceries page.
     private static String scrapeTitle(Element element) {
         // the title is in the hyperlink text.
         return element.select("a").first().text();
     }
+
 
     // scrapes the Unit price of a product from the groceries page.
     private static String scrapeUnitPrice(Element element) {
@@ -79,6 +83,21 @@ public class GroceriesScraper {
                         // the unit price is in the first 4 characters in the pricePerUnit element.
                         element.select("p.pricePerUnit").first().text().substring(1, 5)));
     }
+
+
+    // scrapes the kcal per 100g of a product from the product page html.
+    private static String scrapeKcalPer100g(Element element) {
+        // some products don't have to nutrition table.
+        if (element.select("tr:contains(kcal)").text().equals(""))
+            return "";
+        else
+            // one of the tables is slightly different to the others and has a seperate row for kcal
+            if (element.select("tr:contains(kcal)").text().substring(0, 2).equals("En"))
+                return element.select("tr:contains(kcal) > td").text().substring(0, 2);
+            else
+                return element.select("tr:contains(kcal)").text().substring(0, 2);
+    }
+
 
     /*  scrapes the first line of the Description of a product from the product page html.
 
