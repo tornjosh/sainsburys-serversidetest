@@ -7,10 +7,10 @@ package com.josh.torn.sainsburys;
  */
 class ProductItem {
 
-    private String title;
-    private String unitPrice;
-    private String kcalPer100g;
-    private String description;
+    public String title;
+    public String unitPrice;
+    public String kcalPer100g;
+    public String description;
 
     ProductItem(String title, String unitPrice,
                 String kcalPer100g, String description) {

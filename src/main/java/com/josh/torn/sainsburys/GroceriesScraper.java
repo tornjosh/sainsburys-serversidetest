@@ -1,9 +1,16 @@
 package com.josh.torn.sainsburys;
 
 
+        import java.io.File;
         import java.io.IOException;
         import java.text.DecimalFormat;
 
+        import com.fasterxml.jackson.databind.JsonNode;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import com.fasterxml.jackson.databind.SerializationFeature;
+        import com.fasterxml.jackson.databind.node.ArrayNode;
+        import com.fasterxml.jackson.databind.node.ObjectNode;
+        import org.json.JSONObject;
         import org.jsoup.Jsoup;
         import org.jsoup.nodes.Document;
         import org.jsoup.nodes.Element;
@@ -29,6 +36,8 @@ public class GroceriesScraper {
 
         int index = 0;
 
+        double totalUnitPrice = 0;
+
         // loops through element selecting one element at a time and scraps information
         for(Element product: products) {
 
@@ -44,27 +53,38 @@ public class GroceriesScraper {
 
             String description = scrapeDescription(productPage);
 
-            ProductItem item = new ProductItem(title, unitPrice, kcalPer100g, description);
 
+            ProductItem item = new ProductItem(title, unitPrice, kcalPer100g, description);
             items[index] = item;
 
-            System.out.println(items[index].getTitle());
 
-            System.out.println("£" + items[index].getUnitPrice());
+            //System.out.println(items[index].getTitle());
 
-            System.out.println(items[index].getKcalPer100g());
+            //System.out.println("£" + items[index].getUnitPrice());
 
-            System.out.println(items[index].getDescription());
+            //System.out.println(items[index].getKcalPer100g());
 
-            System.out.println();
+            //System.out.println(items[index].getDescription());
 
+            //System.out.println();
+
+            totalUnitPrice += Double.parseDouble(unitPrice);
             index++;
         }
 
-        // prints the html
-        //System.out.println(products.html());
 
-    }
+        // outputing the data to a json file.
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        ArrayNode results = objectMapper.valueToTree(items);
+        ObjectNode groceries = objectMapper.createObjectNode();
+        groceries.put("results", results);
+        groceries.put("total", totalUnitPrice);
+
+
+        objectMapper.writeValue(new File("groceries.json"), groceries);
+ }
 
 
     // scrapes the title of a product from the groceries page.
