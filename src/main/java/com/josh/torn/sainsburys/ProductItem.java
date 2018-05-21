@@ -1,7 +1,8 @@
 package com.josh.torn.sainsburys;
 
 /**
- * ProductItem
+ *  ProductItem
+ *
  *
  */
 class ProductItem {
