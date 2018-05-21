@@ -2,6 +2,7 @@ package com.josh.torn.sainsburys;
 
 
         import java.io.IOException;
+        import java.text.DecimalFormat;
 
         import org.jsoup.Jsoup;
         import org.jsoup.nodes.Document;
@@ -33,7 +34,7 @@ public class GroceriesScraper {
 
             String title = scrapeTitle(product);
 
-            double unitPrice = 0;
+            String unitPrice = scrapeUnitPrice(product);
 
             int kcalPer100g = 0;
 
@@ -45,12 +46,21 @@ public class GroceriesScraper {
 
             System.out.println(items[index].getTitle());
 
+            System.out.println("£" + items[index].getUnitPrice());
+
             index++;
         }
 
         // prints the html
         //System.out.println(products.html());
 
+    }
+
+    private static String scrapeUnitPrice(Element product) {
+        DecimalFormat decim = new DecimalFormat("0.00");
+        return decim.format(
+                Double.parseDouble(
+                        product.select("p.pricePerUnit").first().text().substring(1, 5)));
     }
 
     // scrapes the title of a product from the product element.

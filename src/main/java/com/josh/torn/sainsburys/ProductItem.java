@@ -8,11 +8,11 @@ package com.josh.torn.sainsburys;
 class ProductItem {
 
     private String title;
-    private double unitPrice;
+    private String unitPrice;
     private int kcalPer100g;
     private String description;
 
-    ProductItem(String title, double unitPrice,
+    ProductItem(String title, String unitPrice,
                 int kcalPer100g, String description) {
         this.title = title;
         this.unitPrice = unitPrice;
@@ -24,11 +24,11 @@ class ProductItem {
         return title;
     }
 
-    double getUnitPrice() {
+    String getUnitPrice() {
         return unitPrice;
     }
 
-    double getKcalPer100g() {
+    int getKcalPer100g() {
         return kcalPer100g;
     }
 
