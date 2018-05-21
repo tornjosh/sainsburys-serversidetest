@@ -36,9 +36,13 @@ public class GroceriesScraper {
 
             String unitPrice = scrapeUnitPrice(product);
 
+
+            Document productPage;
+            productPage = Jsoup.connect(product.select("a").attr("abs:href")).get();
+
             int kcalPer100g = 0;
 
-            String description = "";
+            String description = scrapeDescription(productPage);
 
             ProductItem item = new ProductItem(title, unitPrice, kcalPer100g, description);
 
@@ -48,6 +52,10 @@ public class GroceriesScraper {
 
             System.out.println("£" + items[index].getUnitPrice());
 
+            System.out.println(items[index].getDescription());
+
+            System.out.println();
+
             index++;
         }
 
@@ -56,15 +64,46 @@ public class GroceriesScraper {
 
     }
 
-    private static String scrapeUnitPrice(Element product) {
+    // scrapes the title of a product from the groceries page.
+    private static String scrapeTitle(Element element) {
+        // the title is in the hyperlink text.
+        return element.select("a").first().text();
+    }
+
+    // scrapes the Unit price of a product from the groceries page.
+    private static String scrapeUnitPrice(Element element) {
+        // formats the string to two decimal places
         DecimalFormat decim = new DecimalFormat("0.00");
         return decim.format(
                 Double.parseDouble(
-                        product.select("p.pricePerUnit").first().text().substring(1, 5)));
+                        // the unit price is in the first 4 characters in the pricePerUnit element.
+                        element.select("p.pricePerUnit").first().text().substring(1, 5)));
     }
 
-    // scrapes the title of a product from the product element.
-    private static String scrapeTitle(Element element) {
-        return element.select("a").first().text();
+    /*  scrapes the first line of the Description of a product from the product page html.
+
+        * for the organic blueberries takes two lines.
+
+        finding the description is quite difficult because on each of the product pages the html is
+        structured slightly differently.
+     */
+    private static String scrapeDescription(Element element) {
+        /* some of the descriptions are just text in the productText element, others are in the memo element.
+           this if statement checks whether the productText is the actual description or starts with "Des",
+           if it starts with "Des" then the actual description is in the memo element.*/
+        if (element.select("div.productText").first().text().substring(0,3).equals("Des")) {
+            /* there is one case where the description is in not in the memo, for that case the description
+               is in the itemTypeGroup element */
+            if (element.select("div.memo").first().text().substring(0,5).equals("Sains")) {
+                return element.select("div.itemTypeGroup").first().text();
+            }
+            else {
+                return element.select("div.memo").first().text();
+            }
+        }
+        else {
+            return element.select("div.productText").first().text();
+
+        }
     }
 }
